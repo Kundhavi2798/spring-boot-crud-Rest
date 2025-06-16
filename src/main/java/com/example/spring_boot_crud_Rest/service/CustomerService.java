@@ -3,6 +3,8 @@ package com.example.spring_boot_crud_Rest.service;
 import com.example.spring_boot_crud_Rest.entity.Customer;
 import com.example.spring_boot_crud_Rest.repository.CustomerRepository;
 import org.springframework.stereotype.Service;
+import com.example.spring_boot_crud_Rest.exception.SlotUnavailableException;
+import com.example.spring_boot_crud_Rest.exception.NameAlreadyExistsException;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +28,17 @@ public class CustomerService {
     }
 
     public Customer createCustomer(Customer customer) {
+
+        Optional<Customer> existingBooking = customerRepository.findByBookingDate(customer.getBookingDate());
+         if (existingBooking.isPresent()) {
+throw new SlotUnavailableException("No slot available at this time.");
+    }
+        Optional<Customer> existingName = customerRepository.findByName(customer.getName());
+    
+     if (existingName.isPresent()) {
+throw new NameAlreadyExistsException("The name of the customer already exisit.");
+    }
+    
         return customerRepository.save(customer);
     }
 
